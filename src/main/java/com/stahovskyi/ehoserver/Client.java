@@ -1,15 +1,19 @@
-package com.stahovskyi.ehoserver.readerwriter.client1;
+package com.stahovskyi.ehoserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 
-public class FirstClient1 {
+public class Client {
 
     private static final int PORT = 3000;
-    private static final int NUMBER_OF_SESSIONS = 2;
 
     public static void main(String[] args) {
-        int count = 0;
+        Client client = new Client();
+        client.run();
+    }
+
+    void run() {
 
         try (Socket clientSocket = new Socket("localhost", PORT);
 
@@ -17,30 +21,35 @@ public class FirstClient1 {
              BufferedReader socketInputReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
              BufferedWriter socketOutputWriter = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()))) {
 
-            if (clientSocket.isConnected()) {
+            validateConnection(clientSocket);
 
-                System.out.println(" <-- CONNECTED TO THE SERVER SUCCESSFULLY !! --> ");
-                System.out.println(" << WRITE YOUR MASSAGE >> ");
-            }
-
-            while (count < NUMBER_OF_SESSIONS) {
+            while (true) {
 
                 String consoleMassage = consoleInputReader.readLine();
+                if (consoleMassage.equals("stop")) {
+                    break;
+                }
+
                 socketOutputWriter.write(consoleMassage + "\n");
                 socketOutputWriter.flush();
 
                 String inputMassage = socketInputReader.readLine();
                 System.out.println(" SERVER MASSAGE -> " + inputMassage);
-                count++;
             }
 
             System.out.println(" <<-- THE CONNECTION IS STOPPED !! -->> ");
 
         } catch (IOException exception) {
-            exception.fillInStackTrace();
+            exception.printStackTrace();
         }
     }
-}
 
+    private void validateConnection(Socket clientSocket) throws SocketException {
+        if (clientSocket.isConnected()) {
+            System.out.println(" <-- CONNECTED TO THE SERVER SUCCESSFULLY !! --> ");
+            System.out.println(" << WRITE YOUR MASSAGE >> ");
+        } else throw new SocketException(" << !! CONNECTION IS FAILED !! >> ");
+    }
+}
 
 

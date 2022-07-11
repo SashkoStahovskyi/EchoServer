@@ -1,21 +1,23 @@
-package com.stahovskyi.ehoserver.readerwriter.echoserver1;
+package com.stahovskyi.ehoserver;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class EchoServer1 {
+public class EchoServer {
 
     private static final int PORT = 3000;
 
     public static void main(String[] args) throws IOException {
-        EchoServer1 server = new EchoServer1();
+        EchoServer server = new EchoServer();
         server.run();
     }
 
     void run() throws IOException {
+        String request;
 
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+            System.out.println("  << -- SERVER STARTED -- >> ");
 
             while (true) {
 
@@ -24,12 +26,12 @@ public class EchoServer1 {
                      BufferedReader socketInputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                      BufferedWriter socketOutputWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
 
+                    while ((request = socketInputReader.readLine()) != null) {
+                        System.out.println(" CLIENT MASSAGE -> " + request);
 
-                    String inputMassage = socketInputReader.readLine();
-                    System.out.println(" CLIENT MASSAGE -> " + inputMassage);
-
-                    socketOutputWriter.write(" ECHO " + inputMassage + "\n");
-                    socketOutputWriter.flush();
+                        socketOutputWriter.write(" ECHO " + request + "\n");
+                        socketOutputWriter.flush();
+                    }
                 }
             }
         }
